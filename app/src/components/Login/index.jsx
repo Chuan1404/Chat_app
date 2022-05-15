@@ -1,31 +1,27 @@
 import { Button, Col, Row, Typography } from 'antd';
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
-import { login } from '../../store/slices/authSilce';
-import firebase, { auth } from '../firebase/config';
+import React from 'react';
+import firebase, { auth, db } from '../../firebase/config';
+import { addDocument } from '../../firebase/service';
 
 const { Title } = Typography
 
 const fbProvider = new firebase.auth.FacebookAuthProvider()
 
 export default function Login() {
-    const { isLogin } = useSelector(store => store.auth)
-    const dispatch = useDispatch()
 
-    useEffect(() => {
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                dispatch(login(user))
-            }
-        })
-    }, [isLogin])
+    const handeLoginFabook = async () => {
+        const { additionalUserInfo, user } = await auth.signInWithPopup(fbProvider)
+        // console.log(data)
 
-    const handeLoginFabook = () => {
-        auth.signInWithPopup(fbProvider)
-    }
-    if (isLogin) {
-        return <Navigate to='/' />
+        if (additionalUserInfo?.isNewUser) {
+            addDocument('users', {
+                displayName: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL,
+                uid: user.uid,
+                providerId: additionalUserInfo.providerId
+            });
+        }
     }
     return (
         <div className='login'>
