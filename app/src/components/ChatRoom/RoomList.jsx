@@ -31,13 +31,26 @@ const LinkStyled = styled(Typography.Link)`
 `
 
 export default function RoomList() {
-  const { rooms } = useContext(AppContext)
+  const { rooms, setIsAddRoomVisible, setSelectedRoomId } = useContext(AppContext);
+  const handleAddRoom = () => {
+    setIsAddRoomVisible(true)
+  }
   return (
     <div className='roomList'>
       <Collapse ghost defaultActiveKey={['1']}>
         <PanelStyled header='Danh sách các phòng' key='1'>
-          {rooms.map(room => <LinkStyled key={room.id}>{room.name}</LinkStyled>)}
-          <Button type='text' icon={<PlusSquareOutlined />} className='addRoom'>Add Room</Button>
+          {rooms.map(room =>
+            <LinkStyled
+              key={room.id}
+              onClick={() => setSelectedRoomId(room.id)}
+            >{room.name}</LinkStyled>
+          )}
+          <Button type='text'
+            icon={<PlusSquareOutlined />}
+            className='addRoom'
+            onClick={handleAddRoom}>
+            Add Room
+          </Button>
         </PanelStyled>
       </Collapse>
     </div>

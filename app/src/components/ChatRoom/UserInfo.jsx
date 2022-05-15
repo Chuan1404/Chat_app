@@ -21,7 +21,6 @@ export default function UserInfo() {
   // }, [])
   const { user: { displayName, photoURL } } = useContext(AuthContext)
 
-
   return (
     <WrapperStyled>
       <div>

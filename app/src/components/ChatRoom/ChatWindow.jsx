@@ -1,7 +1,8 @@
-import React from 'react'
-import styled from 'styled-components'
 import { UserAddOutlined } from '@ant-design/icons'
-import { Avatar, Button, Form, Input, Tooltip } from 'antd'
+import { Alert, Avatar, Button, Form, Input, Tooltip } from 'antd'
+import React, { useContext } from 'react'
+import styled from 'styled-components'
+import { AppContext } from '../../context/AppProvider'
 import Message from './Message'
 
 const HeaderStyled = styled.div`
@@ -59,55 +60,58 @@ const FormStyled = styled(Form)`
 `
 
 export default function ChatWindow() {
+  const { selectedRoom, members, setIsInviteMember } = useContext(AppContext)
+
   return (
     <WrapperStyled>
-      <HeaderStyled>
-        <div className='header__info'>
-          <p className='header__title'>Room 1</p>
-          <span className='header__description'>Day la room 1</span>
-        </div>
-        <div>
-          <ButtonGroupStyled>
-            <Button type='text' icon={<UserAddOutlined />}>Mời</Button>
-          </ButtonGroupStyled>
-          <Avatar.Group size='2' maxCount={2}>
-            <Tooltip title='A'>
-              <Avatar>A</Avatar>
-            </Tooltip>
-            <Tooltip title='A'>
-              <Avatar>A</Avatar>
-            </Tooltip>
-            <Tooltip title='A'>
-              <Avatar>A</Avatar>
-            </Tooltip>
-            <Tooltip title='A'>
-              <Avatar>A</Avatar>
-            </Tooltip>
-          </Avatar.Group>
-        </div>
-      </HeaderStyled>
-      <ContentStyled>
-        <MessageListStyled>
-          <Message text='test'
-            photoURL={null}
-            displayName='Tung'
-            createAt={123123123123123} />
-          <Message text='test'
-            photoURL={null}
-            displayName='Tung'
-            createAt={123123123123123} />
-          <Message text='test'
-            photoURL={null}
-            displayName='Tung'
-            createAt={123123123123123} />
-        </MessageListStyled>
-        <FormStyled>
-          <Form.Item>
-            <Input placeholder='Input...' border='false' autoComplete='off'/>
-          </Form.Item>
-          <Button>Send</Button>
-        </FormStyled>
-      </ContentStyled>
+      {selectedRoom.id ?
+        <>
+          <HeaderStyled>
+            <div className='header__info'>
+              <p className='header__title'>{selectedRoom?.name}</p>
+              <span className='header__description'>{selectedRoom?.description}</span>
+            </div>
+            <div>
+              <ButtonGroupStyled>
+                <Button
+                  type='text'
+                  icon={<UserAddOutlined />}
+                  onClick={() => setIsInviteMember(true)}>Mời</Button>
+              </ButtonGroupStyled>
+              <Avatar.Group size='2' maxCount={2}>
+                {members.map(member =>
+                  <Tooltip title={member.displayName} key={member.id}>
+                    <Avatar src={member.photoURL}>{member.photoURL ? '' : member.displayName?.charAt(0).toUpperCase()}</Avatar>
+                  </Tooltip>)}
+              </Avatar.Group>
+            </div>
+          </HeaderStyled>
+          <ContentStyled>
+            <MessageListStyled>
+              <Message text='test'
+                photoURL={null}
+                displayName='Tung'
+                createAt={123123123123123} />
+              <Message text='test'
+                photoURL={null}
+                displayName='Tung'
+                createAt={123123123123123} />
+              <Message text='test'
+                photoURL={null}
+                displayName='Tung'
+                createAt={123123123123123} />
+            </MessageListStyled>
+            <FormStyled>
+              <Form.Item>
+                <Input placeholder='Input...' border='false' autoComplete='off' />
+              </Form.Item>
+              <Button>Send</Button>
+            </FormStyled>
+          </ContentStyled>
+        </> :
+        <Alert message="Hãy chọn phòng" type="info" showIcon
+        style={{margin: 5}} closable/>}
+
     </WrapperStyled>
   )
 }
