@@ -119,7 +119,7 @@ export default function ChatWindow() {
                   photoURL={mes.photoURL}
                   displayName={mes.displayName}
                   createAt={mes.createAt}
-                   />
+                />
               )}
             </MessageListStyled>
             <FormStyled form={form}>
