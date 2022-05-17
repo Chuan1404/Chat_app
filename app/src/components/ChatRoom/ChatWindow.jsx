@@ -1,8 +1,11 @@
 import { UserAddOutlined } from '@ant-design/icons'
 import { Alert, Avatar, Button, Form, Input, Tooltip } from 'antd'
-import React, { useContext } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { AppContext } from '../../context/AppProvider'
+import { AuthContext } from '../../context/AuthProvider'
+import { addDocument } from '../../firebase/service'
+import useFirebase from '../../hooks/useFirebase'
 import Message from './Message'
 
 const HeaderStyled = styled.div`
@@ -61,6 +64,29 @@ const FormStyled = styled(Form)`
 
 export default function ChatWindow() {
   const { selectedRoom, members, setIsInviteMember } = useContext(AppContext)
+  const { user: { uid, displayName, photoURL } } = useContext(AuthContext)
+  const [form] = Form.useForm()
+  const [input, setInput] = useState();
+  const condition = useMemo(() => ({
+    fieldName: 'roomId',
+    operator: '==',
+    compareValue: selectedRoom.id
+  }), [selectedRoom.id])
+  const messages = useFirebase('messages', condition)
+  const handleInputChange = (e) => {
+    setInput(e.target.value)
+  }
+  const handleSubmit = () => {
+    addDocument('messages', {
+      text: input,
+      uid,
+      photoURL,
+      roomId: selectedRoom.id,
+      displayName
+    })
+    form.resetFields(['messages'])
+  }
+
 
   return (
     <WrapperStyled>
@@ -88,29 +114,32 @@ export default function ChatWindow() {
           </HeaderStyled>
           <ContentStyled>
             <MessageListStyled>
-              <Message text='test'
-                photoURL={null}
-                displayName='Tung'
-                createAt={123123123123123} />
-              <Message text='test'
-                photoURL={null}
-                displayName='Tung'
-                createAt={123123123123123} />
-              <Message text='test'
-                photoURL={null}
-                displayName='Tung'
-                createAt={123123123123123} />
+              {messages?.map(mes =>
+                <Message text={mes.text}
+                  photoURL={mes.photoURL}
+                  displayName={mes.displayName}
+                  createAt={mes.createAt}
+                   />
+              )}
             </MessageListStyled>
-            <FormStyled>
-              <Form.Item>
-                <Input placeholder='Input...' border='false' autoComplete='off' />
+            <FormStyled form={form}>
+              <Form.Item name='messages'>
+                <Input
+                  onChange={handleInputChange}
+                  onPressEnter={handleSubmit}
+                  placeholder='Input...'
+                  border='false'
+                  autoComplete='off' />
               </Form.Item>
-              <Button>Send</Button>
+              <Button onClick={handleSubmit}>Send</Button>
             </FormStyled>
           </ContentStyled>
         </> :
-        <Alert message="Hãy chọn phòng" type="info" showIcon
-        style={{margin: 5}} closable/>}
+        <Alert
+          message="Hãy chọn phòng"
+          type="info"
+          showIcon
+          style={{ margin: 5 }} closable />}
 
     </WrapperStyled>
   )

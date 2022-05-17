@@ -7,9 +7,12 @@ const useFirebase = (collection, condition) => {
         let collectionRef = db.collection(collection).orderBy('createAt')
 
         if (condition) {
-            if (!condition.compareValue || !condition.compareValue.length) return
+            if (!condition.compareValue || !condition.compareValue.length) {
+                setDocuments([])
+                return
+            }
             collectionRef = collectionRef.where(
-                condition.fielName,
+                condition.fieldName,
                 condition.operator,
                 condition.compareValue
             )

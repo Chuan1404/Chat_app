@@ -12,7 +12,7 @@ export default function AppProvider({ children }) {
 
     const roomsCondition = useMemo(() => {
         return {
-            fielName: 'members',
+            fieldName: 'members',
             operator: 'array-contains',
             compareValue: uid
         }
@@ -24,7 +24,7 @@ export default function AppProvider({ children }) {
     )
     const userCondition = useMemo(() => {
         return {
-            fielName: 'uid',
+            fieldName: 'uid',
             operator: 'in',
             compareValue: selectedRoom.members
         }
